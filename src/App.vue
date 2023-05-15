@@ -1,28 +1,61 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <AddNewTodo
+    @add-new-todo="addNewTodo"
+    />
+    <ol class="list-group">
+      <TodoList
+      v-for="(todo, index) in todos" 
+      :key="todo.id"
+      :index="index"
+      :todo="todo"
+      @is-checked="isChecked"
+      @remove-todo="removeTodo"
+      />
+    </ol>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import AddNewTodo from '@/components/AddNewTodo'
+import TodoList from "@/components/TodoList.vue"
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    TodoList, AddNewTodo
+  },
+  data: () => ({
+    todos: [],
+    idCounter: 2,
+  }),
+  methods: {
+    isChecked: function(index) {
+      this.todos[index].completed = !this.todos[index].completed;
+    },
+    addNewTodo: function(localInput) {
+      this.idCounter++;
+      this.todos.push({
+        id: this.idCounter,
+        title: localInput,
+        completed: false,
+      })
+    },
+    removeTodo: function(index) {
+      this.todos.splice(index, 1);
+    }
+  },
+  created: function() {
+    fetch('https://jsonplaceholder.typicode.com/todos?_limit=10')
+      .then(response => response.json())
+      .then(data=> this.todos = data)
   }
 }
 </script>
 
 <style>
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+  margin: 20px;
+  
 }
 </style>
